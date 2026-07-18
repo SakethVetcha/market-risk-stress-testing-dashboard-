@@ -2,6 +2,29 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 
+# Common Indian index tickers on Yahoo Finance, keyed by a friendly label.
+NSE_INDEX_TICKERS = {
+    "NIFTY 50": "^NSEI",
+    "NIFTY BANK": "^NSEBANK",
+    "SENSEX": "^BSESN",
+}
+
+def normalize_nse_tickers(tickers, is_nse=False):
+    """
+    If is_nse=True, append the ".NS" suffix Yahoo Finance uses for NSE-listed
+    stocks (e.g. "RELIANCE" -> "RELIANCE.NS"). Leaves index tickers (starting
+    with "^") and tickers that already end in ".NS" untouched.
+    """
+    if not is_nse:
+        return tickers
+    normalized = []
+    for t in tickers:
+        if t.startswith("^") or t.upper().endswith(".NS"):
+            normalized.append(t)
+        else:
+            normalized.append(f"{t}.NS")
+    return normalized
+
 def get_price_data(tickers, start, end):
     """
     Download Adjusted Close prices for a list of tickers
